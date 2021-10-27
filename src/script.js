@@ -2,6 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "dat.gui";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 /**
  * Base
@@ -15,14 +16,38 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+// GLTF loader
+const gltfLoader = new GLTFLoader();
+
+// Texture loader
+const textureLoader = new THREE.TextureLoader();
+
+// load textures
+const houseMap = textureLoader.load("texture/house_baked002.png");
+houseMap.flipY = false;
+houseMap.encoding = THREE.sRGBEncoding;
+
 /**
  * Test sphere
  */
-const testCube = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial()
-);
-scene.add(testCube);
+// const testCube = new THREE.Mesh(
+//   new THREE.BoxGeometry(1, 1, 1),
+//   new THREE.MeshBasicMaterial()
+// );
+// scene.add(testCube);
+
+/**
+ * Load Model
+ */
+gltfLoader.load("/model/basic_house.glb", (gltf) => {
+  gltf.scene.traverse((child) => {
+    child.material = new THREE.MeshBasicMaterial({
+      map: houseMap,
+      side: THREE.DoubleSide,
+    });
+  });
+  scene.add(gltf.scene);
+});
 
 /**
  * Sizes
@@ -56,7 +81,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(4, 1, -4);
+camera.position.set(4, 4, -6);
 scene.add(camera);
 
 // Controls
@@ -71,6 +96,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
 
 /**
  * Animate
