@@ -23,7 +23,7 @@ const gltfLoader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
 
 // load textures
-const houseMap = textureLoader.load("texture/house_baked002.png");
+const houseMap = textureLoader.load("texture/house_baked.png");
 houseMap.flipY = false;
 houseMap.encoding = THREE.sRGBEncoding;
 
