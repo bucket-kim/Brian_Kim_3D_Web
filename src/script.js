@@ -23,7 +23,7 @@ const gltfLoader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
 
 // load textures
-const houseMap = textureLoader.load("texture/house_baked.png");
+const houseMap = textureLoader.load("texture/house_night_baked.png");
 houseMap.flipY = false;
 houseMap.encoding = THREE.sRGBEncoding;
 
@@ -46,6 +46,7 @@ gltfLoader.load("/model/basic_house.glb", (gltf) => {
       side: THREE.DoubleSide,
     });
   });
+  gltf.scene.position.y = -1;
   scene.add(gltf.scene);
 });
 
@@ -76,12 +77,12 @@ window.addEventListener("resize", () => {
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  75,
+  25,
   sizes.width / sizes.height,
   0.1,
-  100
+  1000
 );
-camera.position.set(4, 4, -6);
+camera.position.set(14, 10, 14);
 scene.add(camera);
 
 // Controls
