@@ -1,5 +1,6 @@
 import "./style.css";
 import * as THREE from "three";
+import Stats from "three/examples/jsm/libs/stats.module";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "dat.gui";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -83,11 +84,29 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 camera.position.set(14, 10, 14);
+// const cameraTarget = new THREE.Vector3(14, 10, 14);
 scene.add(camera);
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
+
+/**
+ * Navigation control
+ */
+controls.minAzimuthAngle = 0;
+controls.maxAzimuthAngle = Math.PI / 2;
+
+controls.minPolarAngle = 0;
+controls.maxPolarAngle = Math.PI / 2;
+
+controls.minDistance = 5;
+controls.maxDistance = 20;
+
+controls.zoomSpeed = 0.3;
+
 controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+controls.rotateSpeed = 0.25;
 
 /**
  * Renderer
@@ -99,6 +118,10 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputEncoding = THREE.sRGBEncoding;
 
+// stats
+const stats = Stats();
+document.body.appendChild(stats.dom);
+
 /**
  * Animate
  */
@@ -108,6 +131,10 @@ const tick = () => {
 
   // Render
   renderer.render(scene, camera);
+
+  // camera.position.lerp(cameraTarget, 0.01);
+
+  stats.update();
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
