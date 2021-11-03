@@ -7,12 +7,16 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import normalizeWheel from "normalize-wheel";
 import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
+import { Pane } from "tweakpane";
 
 /**
  * Base
  */
 // Debug
 const gui = new dat.GUI();
+
+// tweakpane
+const pane = new Pane();
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");
@@ -57,11 +61,30 @@ gltfLoader.load("/model/basic_house.glb", (gltf) => {
 // coffee steam model
 gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
   let model = gltf.scene;
+  const coffeeSteam = pane.addFolder({
+    title: "coffee steam",
+  });
   model.traverse((child) => {
     child.material = new THREE.ShaderMaterial({
+      transparent: true,
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
+      uniforms: {
+        vUvFrequency: { value: new THREE.Vector2(10, 10) },
+      },
     });
+    if (child.name === "Plane029") {
+      coffeeSteam.addInput(child.material.uniforms.vUvFrequency.value, "x", {
+        min: 0.001,
+        max: 20,
+        step: 0.001,
+      });
+      coffeeSteam.addInput(child.material.uniforms.vUvFrequency.value, "y", {
+        min: 0.001,
+        max: 20,
+        step: 0.001,
+      });
+    }
   });
   model.position.y = -1;
   scene.add(model);
