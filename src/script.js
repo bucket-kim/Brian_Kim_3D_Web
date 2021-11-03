@@ -4,6 +4,9 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "dat.gui";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import normalizeWheel from "normalize-wheel";
+import vertexShader from "./shader/coffeeSteam/vertex.glsl";
+import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
 
 /**
  * Base
@@ -49,6 +52,19 @@ gltfLoader.load("/model/basic_house.glb", (gltf) => {
   });
   gltf.scene.position.y = -1;
   scene.add(gltf.scene);
+});
+
+// coffee steam model
+gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
+  let model = gltf.scene;
+  model.traverse((child) => {
+    child.material = new THREE.ShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+    });
+  });
+  model.position.y = -1;
+  scene.add(model);
 });
 
 /**
@@ -108,11 +124,14 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.25;
 
+// zoom smoothe feature
+
 /**
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
+  vertexShader: vertexShader,
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -131,8 +150,6 @@ const tick = () => {
 
   // Render
   renderer.render(scene, camera);
-
-  // camera.position.lerp(cameraTarget, 0.01);
 
   stats.update();
 
