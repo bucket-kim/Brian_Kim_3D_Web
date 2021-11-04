@@ -47,6 +47,8 @@ houseMap.encoding = THREE.sRGBEncoding;
 /**
  * Load Model
  */
+
+// static house
 gltfLoader.load("/model/basic_house.glb", (gltf) => {
   gltf.scene.traverse((child) => {
     child.material = new THREE.MeshBasicMaterial({
@@ -55,6 +57,22 @@ gltfLoader.load("/model/basic_house.glb", (gltf) => {
     });
   });
   gltf.scene.position.y = -1;
+  scene.add(gltf.scene);
+});
+
+// active chair top part
+
+let chair = new THREE.Object3D();
+
+gltfLoader.load("/model/topChair.glb", (gltf) => {
+  gltf.scene.traverse((child) => {
+    child.material = new THREE.MeshBasicMaterial({
+      map: houseMap,
+      side: THREE.DoubleSide,
+    });
+  });
+  gltf.scene.position.y = -1;
+  chair = gltf.scene.children[0];
   scene.add(gltf.scene);
 });
 
@@ -206,6 +224,9 @@ const tick = () => {
 
   // steam animation
   steamShader.uniforms.uTime.value = elapsedTime;
+
+  // chair animation
+  chair.rotation.y = Math.sin(elapsedTime * 0.75) * 0.5;
 
   // Render
   renderer.render(scene, camera);
