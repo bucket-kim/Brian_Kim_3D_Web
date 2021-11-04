@@ -226,7 +226,7 @@ const tick = () => {
   steamShader.uniforms.uTime.value = elapsedTime;
 
   // chair animation
-  chair.rotation.y = Math.sin(elapsedTime * 0.5) * 0.5;
+  chair.rotation.y = Math.sin(elapsedTime * 0.75) * 0.5;
 
   // Render
   renderer.render(scene, camera);
