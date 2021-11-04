@@ -60,7 +60,12 @@ gltfLoader.load("/model/basic_house.glb", (gltf) => {
 
 // coffee steam model
 
+let steamColor = {
+  color: "#95847e",
+};
+
 const steamShader = new THREE.ShaderMaterial({
+  color: steamColor,
   transparent: true,
   depthWrite: false,
   vertexShader: vertexShader,
@@ -69,6 +74,7 @@ const steamShader = new THREE.ShaderMaterial({
     uTime: { value: 0 },
     uTimeFreq: { value: 0.5 },
     vUvFrequency: { value: new THREE.Vector2(2.5, 2.5) },
+    uColor: { value: new THREE.Color(steamColor.color) },
   },
 });
 
@@ -81,6 +87,13 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
   model.traverse((child) => {
     child.material = steamShader;
     if (child.name === "Plane029") {
+      coffeeSteam
+        .addInput(steamColor, "color", {
+          view: "color",
+        })
+        .on("change", () => {
+          steamShader.uniforms.uColor.value.set(steamColor.color);
+        });
       coffeeSteam.addInput(child.material.uniforms.uTimeFreq, "value", {
         label: "frequency",
         min: 0.001,
@@ -88,11 +101,13 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
         step: 0.001,
       });
       coffeeSteam.addInput(child.material.uniforms.vUvFrequency.value, "x", {
+        label: "length",
         min: 0.001,
         max: 5,
         step: 0.001,
       });
       coffeeSteam.addInput(child.material.uniforms.vUvFrequency.value, "y", {
+        label: "thickness",
         min: 0.001,
         max: 5,
         step: 0.001,
