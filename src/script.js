@@ -59,29 +59,42 @@ gltfLoader.load("/model/basic_house.glb", (gltf) => {
 });
 
 // coffee steam model
+
+const steamShader = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
+  uniforms: {
+    uTime: { value: 0 },
+    uTimeFreq: { value: 0.5 },
+    vUvFrequency: { value: new THREE.Vector2(2.5, 2.5) },
+  },
+});
+
 gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
-  let model = gltf.scene;
+  const model = gltf.scene;
+  model.name = "model";
   const coffeeSteam = pane.addFolder({
     title: "coffee steam",
   });
   model.traverse((child) => {
-    child.material = new THREE.ShaderMaterial({
-      transparent: true,
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
-      uniforms: {
-        vUvFrequency: { value: new THREE.Vector2(10, 10) },
-      },
-    });
+    child.material = steamShader;
     if (child.name === "Plane029") {
+      coffeeSteam.addInput(child.material.uniforms.uTimeFreq, "value", {
+        label: "frequency",
+        min: 0.001,
+        max: 2,
+        step: 0.001,
+      });
       coffeeSteam.addInput(child.material.uniforms.vUvFrequency.value, "x", {
         min: 0.001,
-        max: 20,
+        max: 5,
         step: 0.001,
       });
       coffeeSteam.addInput(child.material.uniforms.vUvFrequency.value, "y", {
         min: 0.001,
-        max: 20,
+        max: 5,
         step: 0.001,
       });
     }
@@ -138,7 +151,7 @@ controls.maxAzimuthAngle = Math.PI / 2;
 controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
 
-controls.minDistance = 5;
+controls.minDistance = 3;
 controls.maxDistance = 20;
 
 controls.zoomSpeed = 0.3;
@@ -167,9 +180,17 @@ document.body.appendChild(stats.dom);
 /**
  * Animate
  */
+
+const clock = new THREE.Clock();
+
 const tick = () => {
+  const elapsedTime = clock.getElapsedTime();
+
   // Update controls
   controls.update();
+
+  // steam animation
+  steamShader.uniforms.uTime.value = elapsedTime;
 
   // Render
   renderer.render(scene, camera);
