@@ -8,6 +8,7 @@ import normalizeWheel from "normalize-wheel";
 import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
 import { Pane } from "tweakpane";
+import { sRGBEncoding } from "three";
 
 /**
  * Base
@@ -172,9 +173,15 @@ gltfLoader.load("/model/macScreen.glb", (gltf) => {
 });
 
 // computer screen
+const logoTexture = textureLoader.load("/texture/logo.png");
+logoTexture.encoding = sRGBEncoding;
+const logoMat = new THREE.MeshBasicMaterial({
+  map: logoTexture,
+});
+
 gltfLoader.load("/model/computerScreen.glb", (gltf) => {
   gltf.scene.traverse((child) => {
-    child.material = danceVidMat;
+    child.material = logoMat;
   });
   gltf.scene.position.y = -1;
   scene.add(gltf.scene);
