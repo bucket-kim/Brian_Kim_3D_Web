@@ -157,6 +157,7 @@ danceVideo.autoplay = true;
 danceVideo.controls = false;
 
 const videoTexture = new THREE.VideoTexture(danceVideo);
+videoTexture.encoding = THREE.sRGBEncoding;
 
 const danceVidMat = new THREE.MeshBasicMaterial({
   map: videoTexture,
