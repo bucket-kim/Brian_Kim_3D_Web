@@ -171,6 +171,15 @@ gltfLoader.load("/model/macScreen.glb", (gltf) => {
   scene.add(gltf.scene);
 });
 
+// computer screen
+gltfLoader.load("/model/computerScreen.glb", (gltf) => {
+  gltf.scene.traverse((child) => {
+    child.material = danceVidMat;
+  });
+  gltf.scene.position.y = -1;
+  scene.add(gltf.scene);
+});
+
 /**
  * Sizes
  */
