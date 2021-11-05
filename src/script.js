@@ -13,7 +13,7 @@ import { Pane } from "tweakpane";
  * Base
  */
 // Debug
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
 // tweakpane
 const pane = new Pane();
@@ -134,6 +134,40 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
   });
   model.position.y = -1;
   scene.add(model);
+});
+
+// mac screen loader
+const danceVideo = document.createElement("video");
+const body = document.querySelector("body");
+body.append(danceVideo);
+
+document.addEventListener(
+  "contextmenu",
+  (e) => {
+    e.preventDefault();
+  },
+  false
+);
+
+danceVideo.src = "/video/brianDanceVideo.mp4";
+danceVideo.muted = true;
+danceVideo.playsInline = true;
+danceVideo.loop = true;
+danceVideo.autoplay = true;
+danceVideo.controls = false;
+
+const videoTexture = new THREE.VideoTexture(danceVideo);
+
+const danceVidMat = new THREE.MeshBasicMaterial({
+  map: videoTexture,
+});
+
+gltfLoader.load("/model/macScreen.glb", (gltf) => {
+  gltf.scene.traverse((child) => {
+    child.material = danceVidMat;
+  });
+  gltf.scene.position.y = -1;
+  scene.add(gltf.scene);
 });
 
 /**
