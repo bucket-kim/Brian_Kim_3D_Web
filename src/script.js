@@ -4,7 +4,7 @@ import Stats from "three/examples/jsm/libs/stats.module";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as dat from "dat.gui";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import normalizeWheel from "normalize-wheel";
+import gsap from "gsap";
 import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
 import bakedVertexShader from "./shader/baked/vertex.glsl";
@@ -42,9 +42,13 @@ const houseNightMap = textureLoader.load("texture/house_baked_noLight.png");
 houseNightMap.flipY = false;
 houseNightMap.encoding = THREE.sRGBEncoding;
 
-const houseNightLightMap = textureLoader.load("texture/ambient_light.png");
-houseNightLightMap.flipY = false;
-houseNightLightMap.encoding = THREE.sRGBEncoding;
+const lighttMap = textureLoader.load("texture/house_night_baked.png");
+lighttMap.flipY = false;
+lighttMap.encoding = THREE.sRGBEncoding;
+
+const fairyMap = textureLoader.load("texture/ambient_light.png");
+fairyMap.flipY = false;
+fairyMap.encoding = THREE.sRGBEncoding;
 
 /**
  * Load Model
@@ -61,19 +65,26 @@ emissionColor.computerColor = "#fba03a";
 emissionColor.shelfColor = "#5CADFF";
 
 let ambientColor = {};
-ambientColor.fairyColor = "#f2d2a9";
+ambientColor.roomColor = "#fff1df";
+ambientColor.fairyColor = "#fff1df";
 
 const lightShader = new THREE.ShaderMaterial({
   uniforms: {
     uBakedTexture: { value: houseMap },
     uBakedNightTexture: { value: houseNightMap },
-    uFairyTexture: { value: houseNightLightMap },
+    uFairyTexture: { value: fairyMap },
     uLightMapTexture: { value: bakedEmission },
+    uNightLightTexture: { value: lighttMap },
 
-    uMix: { value: true },
+    uMix: { value: 0 },
+
+    uNightLight: { value: 0 },
 
     uFairyColor: { value: new THREE.Color(ambientColor.fairyColor) },
     uFairyLightStrength: { value: 1.0 },
+
+    // uRoomColor: { value: new THREE.Color(ambientColor.roomColor) },
+    // uRoomLightStrength: { value: 1.0 },
 
     uDeskLightColor: { value: new THREE.Color(emissionColor.deskColor) },
     uDeskLightStrength: { value: 1.5 },
@@ -93,11 +104,26 @@ const dayNight = pane.addFolder({
   title: "Day and Night",
 });
 
-dayNight.addInput(lightShader.uniforms.uMix, "value", {
-  label: "Day and Night",
+const lightSwitch = pane.addInput(lightShader.uniforms.uNightLight, "value", {
+  label: "Light on and off",
   min: 0,
   max: 1,
+  disabled: true,
 });
+
+dayNight
+  .addInput(lightShader.uniforms.uMix, "value", {
+    label: "Day and Night",
+    min: 0,
+    max: 1,
+  })
+  .on("change", () => {
+    if (lightShader.uniforms.uMix.value === 1) {
+      lightSwitch.disabled = false;
+    } else {
+      lightSwitch.disabled = true;
+    }
+  });
 
 const emission = pane.addFolder({
   title: "Emission Lights",
@@ -106,7 +132,7 @@ const emission = pane.addFolder({
 emission
   .addInput(emissionColor, "deskColor", {
     view: "color",
-    label: "desk light color",
+    label: "desk light",
   })
   .on("change", () => {
     lightShader.uniforms.uDeskLightColor.value.set(emissionColor.deskColor);
@@ -115,12 +141,12 @@ emission.addInput(lightShader.uniforms.uDeskLightStrength, "value", {
   min: 0,
   max: 2.5,
   step: 0.01,
-  label: "desk light strength",
+  label: "strength",
 });
 emission
   .addInput(emissionColor, "computerColor", {
     view: "color",
-    label: "computer light color",
+    label: "computer light",
   })
   .on("change", () => {
     lightShader.uniforms.uCompLightColor.value.set(emissionColor.computerColor);
@@ -129,12 +155,12 @@ emission.addInput(lightShader.uniforms.uCompLightStrength, "value", {
   min: 0,
   max: 2.5,
   step: 0.01,
-  label: "computer light strength",
+  label: "strength",
 });
 emission
   .addInput(emissionColor, "shelfColor", {
     view: "color",
-    label: "shelf light color",
+    label: "shelf light",
   })
   .on("change", () => {
     lightShader.uniforms.uShelfLightColor.value.set(emissionColor.shelfColor);
@@ -143,7 +169,7 @@ emission.addInput(lightShader.uniforms.uShelfLightStrength, "value", {
   min: 0,
   max: 2.5,
   step: 0.01,
-  label: "shelf light strength",
+  label: "strength",
 });
 emission
   .addInput(ambientColor, "fairyColor", {
@@ -157,7 +183,7 @@ emission.addInput(lightShader.uniforms.uFairyLightStrength, "value", {
   min: 0,
   max: 2.5,
   step: 0.01,
-  label: "fairy light strength",
+  label: "strength",
 });
 
 // static house
