@@ -34,9 +34,17 @@ const gltfLoader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
 
 // load textures
-const houseMap = textureLoader.load("texture/house_night_baked.png");
+const houseMap = textureLoader.load("texture/house_baked.png");
 houseMap.flipY = false;
 houseMap.encoding = THREE.sRGBEncoding;
+
+const houseNightMap = textureLoader.load("texture/house_baked_noLight.png");
+houseNightMap.flipY = false;
+houseNightMap.encoding = THREE.sRGBEncoding;
+
+const houseNightLightMap = textureLoader.load("texture/ambient_light.png");
+houseNightLightMap.flipY = false;
+houseNightLightMap.encoding = THREE.sRGBEncoding;
 
 /**
  * Load Model
@@ -53,13 +61,19 @@ emissionColor.computerColor = "#fba03a";
 emissionColor.shelfColor = "#5CADFF";
 
 let ambientColor = {};
-ambientColor.lampColor = "#ed7014";
-ambientColor.fairyColor = "#0000ff";
+ambientColor.fairyColor = "#f2d2a9";
 
 const lightShader = new THREE.ShaderMaterial({
   uniforms: {
     uBakedTexture: { value: houseMap },
+    uBakedNightTexture: { value: houseNightMap },
+    uFairyTexture: { value: houseNightLightMap },
     uLightMapTexture: { value: bakedEmission },
+
+    uMix: { value: true },
+
+    uFairyColor: { value: new THREE.Color(ambientColor.fairyColor) },
+    uFairyLightStrength: { value: 1.0 },
 
     uDeskLightColor: { value: new THREE.Color(emissionColor.deskColor) },
     uDeskLightStrength: { value: 1.5 },
@@ -73,6 +87,16 @@ const lightShader = new THREE.ShaderMaterial({
   vertexShader: bakedVertexShader,
   fragmentShader: bakedFragmentShader,
   side: THREE.DoubleSide,
+});
+
+const dayNight = pane.addFolder({
+  title: "Day and Night",
+});
+
+dayNight.addInput(lightShader.uniforms.uMix, "value", {
+  label: "Day and Night",
+  min: 0,
+  max: 1,
 });
 
 const emission = pane.addFolder({
@@ -120,6 +144,20 @@ emission.addInput(lightShader.uniforms.uShelfLightStrength, "value", {
   max: 2.5,
   step: 0.01,
   label: "shelf light strength",
+});
+emission
+  .addInput(ambientColor, "fairyColor", {
+    view: "color",
+    label: "fairy color",
+  })
+  .on("change", () => {
+    lightShader.uniforms.uFairyColor.value.set(ambientColor.fairyColor);
+  });
+emission.addInput(lightShader.uniforms.uFairyLightStrength, "value", {
+  min: 0,
+  max: 2.5,
+  step: 0.01,
+  label: "fairy light strength",
 });
 
 // static house
@@ -219,7 +257,7 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
 // mac screen loader
 const danceVideo = document.createElement("video");
 const body = document.querySelector("body");
-// body.append(danceVideo);
+body.append(danceVideo);
 
 document.addEventListener(
   "contextmenu",
