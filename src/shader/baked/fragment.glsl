@@ -40,24 +40,24 @@ void main()
     vec3 LightMapColor = texture2D(uLightMapTexture, vUv).rgb;
     vec3 fiaryLightColor = texture2D(uFairyTexture, vUv).rgb;
 
-    vec3 bakedColor = mix(bakedDayColor, bakedNightColor, uMix);
-    vec3 totalColor = mix(bakedColor, nightLightColor, uNightLight);
+    vec3 bakedColor = mix(bakedDayColor, nightLightColor, uMix);
+    // vec3 totalColor = mix(bakedColor, nightLightColor, uNightLight);
 
     float lightDeskStrength = LightMapColor.r * uDeskLightStrength;
-    totalColor = blendGlow(totalColor, uDeskLightColor, lightDeskStrength);
+    bakedColor = blendGlow(bakedColor, uDeskLightColor, lightDeskStrength);
 
     float lightCompStrength = LightMapColor.g * uCompLightStrength;
-    totalColor = blendLighten(totalColor, uCompLightColor, lightCompStrength);
+    bakedColor = blendLighten(bakedColor, uCompLightColor, lightCompStrength);
 
     float lightShelfStrength = LightMapColor.b * uShelfLightStrength;
-    totalColor = blendGlow(totalColor, uShelfLightColor, lightShelfStrength);
+    bakedColor = blendGlow(bakedColor, uShelfLightColor, lightShelfStrength);
 
     float fairyStrength = fiaryLightColor.g * uFairyLightStrength;
-    totalColor = mix (totalColor, uFairyColor, fairyStrength);
+    bakedColor = mix (bakedColor, uFairyColor, fairyStrength);
 
     // float roomStrength = fiaryLightColor.b * uRoomLightStrength;
     // bakedColor = blend (bakedColor, uRoomColor, roomStrength);
 
 
-    gl_FragColor = vec4(totalColor, 1.0);
+    gl_FragColor = vec4(bakedColor, 1.0);
 }

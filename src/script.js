@@ -9,6 +9,8 @@ import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
 import bakedVertexShader from "./shader/baked/vertex.glsl";
 import bakedFragmentShader from "./shader/baked/fragment.glsl";
+import gradVertexShader from "./shader/gradient/vertex.glsl";
+import gradFragmentShader from "./shader/gradient/fragment.glsl";
 import { Pane } from "tweakpane";
 import { sRGBEncoding } from "three";
 
@@ -104,26 +106,18 @@ const dayNight = pane.addFolder({
   title: "Day and Night",
 });
 
-const lightSwitch = pane.addInput(lightShader.uniforms.uNightLight, "value", {
-  label: "Light on and off",
+// const lightSwitch = pane.addInput(lightShader.uniforms.uNightLight, "value", {
+//   label: "Light on and off",
+//   min: 0,
+//   max: 1,
+//   disabled: true,
+// });
+
+dayNight.addInput(lightShader.uniforms.uMix, "value", {
+  label: "Day and Night",
   min: 0,
   max: 1,
-  disabled: true,
 });
-
-dayNight
-  .addInput(lightShader.uniforms.uMix, "value", {
-    label: "Day and Night",
-    min: 0,
-    max: 1,
-  })
-  .on("change", () => {
-    if (lightShader.uniforms.uMix.value === 1) {
-      lightSwitch.disabled = false;
-    } else {
-      lightSwitch.disabled = true;
-    }
-  });
 
 const emission = pane.addFolder({
   title: "Emission Lights",
@@ -387,7 +381,21 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.25;
 
-// zoom smoothe feature
+// const gradient = new THREE.Mesh(
+//   new THREE.PlaneBufferGeometry(2, 2, 1, 1),
+//   new THREE.ShaderMaterial({
+//     uniforms: {
+//       uColorA: { value: new THREE.Color(0x7bdbf6) },
+//       uColorB: { value: new THREE.Color(0x0693f4) },
+//     },
+//     vertexShader: gradVertexShader,
+//     fragmentShader: gradFragmentShader,
+//   })
+// );
+
+// gradient.depthWrite = false;
+// gradient.renderOrder = -999999;
+// scene.add(gradient);
 
 /**
  * Renderer
@@ -399,6 +407,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputEncoding = THREE.sRGBEncoding;
+// renderer.setClearColor(gradient);
 
 // stats
 const stats = Stats();
