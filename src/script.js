@@ -7,6 +7,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import normalizeWheel from "normalize-wheel";
 import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
+import bakedVertexShader from "./shader/baked/vertex.glsl";
+import bakedFragmentShader from "./shader/baked/fragment.glsl";
 import { Pane } from "tweakpane";
 import { sRGBEncoding } from "three";
 
@@ -37,25 +39,93 @@ houseMap.flipY = false;
 houseMap.encoding = THREE.sRGBEncoding;
 
 /**
- * Test sphere
- */
-// const testCube = new THREE.Mesh(
-//   new THREE.BoxGeometry(1, 1, 1),
-//   new THREE.MeshBasicMaterial()
-// );
-// scene.add(testCube);
-
-/**
  * Load Model
  */
 
+// light shaders
+const bakedEmission = textureLoader.load("texture/emission_light.png");
+bakedEmission.flipY = false;
+bakedEmission.encoding = THREE.sRGBEncoding;
+
+let emissionColor = {};
+emissionColor.deskColor = "#ff72f9";
+emissionColor.computerColor = "#fbbb7d";
+emissionColor.shelfColor = "#5CADFF";
+
+let ambientColor = {};
+ambientColor.lampColor = "#ed7014";
+ambientColor.fairyColor = "#0000ff";
+
+const lightShader = new THREE.ShaderMaterial({
+  uniforms: {
+    uBakedTexture: { value: houseMap },
+    uLightMapTexture: { value: bakedEmission },
+
+    uDeskLightColor: { value: new THREE.Color(emissionColor.deskColor) },
+    uDeskLightStrength: { value: 2.0 },
+
+    uCompLightColor: { value: new THREE.Color(emissionColor.computerColor) },
+    uCompLightStrength: { value: 2.5 },
+
+    uShelfLightColor: { value: new THREE.Color(emissionColor.shelfColor) },
+    uShelfLightStrength: { value: 3.0 },
+  },
+  vertexShader: bakedVertexShader,
+  fragmentShader: bakedFragmentShader,
+  side: THREE.DoubleSide,
+});
+
+const emission = pane.addFolder({
+  title: "Emission Lights",
+});
+
+emission
+  .addInput(emissionColor, "deskColor", {
+    view: "color",
+    label: "desk light color",
+  })
+  .on("change", () => {
+    lightShader.uniforms.uDeskLightColor.value.set(emissionColor.deskColor);
+  });
+emission.addInput(lightShader.uniforms.uDeskLightStrength, "value", {
+  min: 0,
+  max: 5,
+  step: 0.01,
+  label: "desk light strength",
+});
+emission
+  .addInput(emissionColor, "computerColor", {
+    view: "color",
+    label: "computer light color",
+  })
+  .on("change", () => {
+    lightShader.uniforms.uCompLightColor.value.set(emissionColor.computerColor);
+  });
+emission.addInput(lightShader.uniforms.uCompLightStrength, "value", {
+  min: 0,
+  max: 5,
+  step: 0.01,
+  label: "computer light strength",
+});
+emission
+  .addInput(emissionColor, "shelfColor", {
+    view: "color",
+    label: "shelf light color",
+  })
+  .on("change", () => {
+    lightShader.uniforms.uShelfLightColor.value.set(emissionColor.shelfColor);
+  });
+emission.addInput(lightShader.uniforms.uShelfLightStrength, "value", {
+  min: 0,
+  max: 5,
+  step: 0.01,
+  label: "shelf light strength",
+});
+
 // static house
-gltfLoader.load("/model/basic_house.glb", (gltf) => {
+gltfLoader.load("/model/basic_house_join.glb", (gltf) => {
   gltf.scene.traverse((child) => {
-    child.material = new THREE.MeshBasicMaterial({
-      map: houseMap,
-      side: THREE.DoubleSide,
-    });
+    child.material = lightShader;
   });
   gltf.scene.position.y = -1;
   scene.add(gltf.scene);
@@ -67,10 +137,19 @@ let chair = new THREE.Object3D();
 
 gltfLoader.load("/model/topChair.glb", (gltf) => {
   gltf.scene.traverse((child) => {
-    child.material = new THREE.MeshBasicMaterial({
-      map: houseMap,
-      side: THREE.DoubleSide,
-    });
+    child.material = lightShader;
+  });
+  gltf.scene.position.y = -1;
+  chair = gltf.scene.children[0];
+  scene.add(gltf.scene);
+});
+
+// photos
+let photos = new THREE.Object3D();
+
+gltfLoader.load("/model/photos.glb", (gltf) => {
+  gltf.scene.traverse((child) => {
+    child.material = lightShader;
   });
   gltf.scene.position.y = -1;
   chair = gltf.scene.children[0];
@@ -140,7 +219,7 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
 // mac screen loader
 const danceVideo = document.createElement("video");
 const body = document.querySelector("body");
-body.append(danceVideo);
+// body.append(danceVideo);
 
 document.addEventListener(
   "contextmenu",
