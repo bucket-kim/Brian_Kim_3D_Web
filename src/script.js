@@ -48,8 +48,8 @@ bakedEmission.flipY = false;
 bakedEmission.encoding = THREE.sRGBEncoding;
 
 let emissionColor = {};
-emissionColor.deskColor = "#ff72f9";
-emissionColor.computerColor = "#fbbb7d";
+emissionColor.deskColor = "#f294ee";
+emissionColor.computerColor = "#fba03a";
 emissionColor.shelfColor = "#5CADFF";
 
 let ambientColor = {};
@@ -62,13 +62,13 @@ const lightShader = new THREE.ShaderMaterial({
     uLightMapTexture: { value: bakedEmission },
 
     uDeskLightColor: { value: new THREE.Color(emissionColor.deskColor) },
-    uDeskLightStrength: { value: 2.0 },
+    uDeskLightStrength: { value: 1.5 },
 
     uCompLightColor: { value: new THREE.Color(emissionColor.computerColor) },
-    uCompLightStrength: { value: 2.5 },
+    uCompLightStrength: { value: 1.5 },
 
     uShelfLightColor: { value: new THREE.Color(emissionColor.shelfColor) },
-    uShelfLightStrength: { value: 3.0 },
+    uShelfLightStrength: { value: 1.5 },
   },
   vertexShader: bakedVertexShader,
   fragmentShader: bakedFragmentShader,
@@ -89,7 +89,7 @@ emission
   });
 emission.addInput(lightShader.uniforms.uDeskLightStrength, "value", {
   min: 0,
-  max: 5,
+  max: 2.5,
   step: 0.01,
   label: "desk light strength",
 });
@@ -103,7 +103,7 @@ emission
   });
 emission.addInput(lightShader.uniforms.uCompLightStrength, "value", {
   min: 0,
-  max: 5,
+  max: 2.5,
   step: 0.01,
   label: "computer light strength",
 });
@@ -117,7 +117,7 @@ emission
   });
 emission.addInput(lightShader.uniforms.uShelfLightStrength, "value", {
   min: 0,
-  max: 5,
+  max: 2.5,
   step: 0.01,
   label: "shelf light strength",
 });

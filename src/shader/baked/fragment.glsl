@@ -16,7 +16,8 @@ uniform float uAmbientStrength;
 
 varying vec2 vUv;
 
-#pragma glslify: blendAdd = require(glsl-blend/add);
+#pragma glslify: blendScreen = require(glsl-blend/screen);
+#pragma glslify: blendLighten = require(glsl-blend/lighten);
 #pragma glslify: blendGlow = require(glsl-blend/glow);
 
 void main()
@@ -27,13 +28,13 @@ void main()
     vec3 LightMapColor = texture2D(uLightMapTexture, vUv).rgb;
 
     float lightDeskStrength = LightMapColor.r * uDeskLightStrength;
-    bakedColor = blendAdd(bakedColor, uDeskLightColor, lightDeskStrength);
+    bakedColor = blendGlow(bakedColor, uDeskLightColor, lightDeskStrength);
 
     float lightCompStrength = LightMapColor.g * uCompLightStrength;
-    bakedColor = blendAdd(bakedColor, uCompLightColor, lightCompStrength);
+    bakedColor = blendLighten(bakedColor, uCompLightColor, lightCompStrength);
 
     float lightShelfStrength = LightMapColor.b * uShelfLightStrength;
-    bakedColor = blendAdd(bakedColor, uShelfLightColor, lightShelfStrength);
+    bakedColor = blendGlow(bakedColor, uShelfLightColor, lightShelfStrength);
 
 
     gl_FragColor = vec4(bakedColor, 1.0);
