@@ -2,15 +2,14 @@ import "./style.css";
 import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "dat.gui";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import gsap from "gsap";
 import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
 import bakedVertexShader from "./shader/baked/vertex.glsl";
 import bakedFragmentShader from "./shader/baked/fragment.glsl";
-import gradVertexShader from "./shader/gradient/vertex.glsl";
-import gradFragmentShader from "./shader/gradient/fragment.glsl";
+import loadVertexShader from "./shader/loader/vertex.glsl";
+import loadFragmentShader from "./shader/loader/fragment.glsl";
 import { Pane } from "tweakpane";
 import { sRGBEncoding } from "three";
 
@@ -29,11 +28,44 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+// loadingManager
+const loadingLine = document.querySelector(".loading-bar");
+
+// const loadingManager = new THREE.LoadingManager(
+//   () => {
+//     gsap.delayedCall(0.5, () => {
+//       gsap.to(overlayMat.uniforms.uAlpha, { duration: 5, value: 0, delay: 1 });
+//       loadingLine.classList.add("ended");
+//       loadingLine.style.transform = "";
+//     });
+//   },
+//   (itemUrl, itemLoaded, itemTotal) => {
+//     const progressRatio = itemLoaded / itemTotal;
+//     loadingLine.style.transform = `scaleX(${progressRatio})`;
+//   }
+// );
+
 // GLTF loader
 const gltfLoader = new GLTFLoader();
 
 // Texture loader
 const textureLoader = new THREE.TextureLoader();
+
+// initial loader
+// const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager);
+
+const overlayGeo = new THREE.PlaneBufferGeometry(2, 2, 1, 1);
+const overlayMat = new THREE.ShaderMaterial({
+  transparent: true,
+  uniforms: {
+    uAlpha: { value: 1.0 },
+  },
+  vertexShader: loadVertexShader,
+  fragmentShader: loadFragmentShader,
+});
+const overlay = new THREE.Mesh(overlayGeo, overlayMat);
+
+// scene.add(overlay);
 
 // load textures
 const houseMap = textureLoader.load("texture/house_baked.png");
@@ -276,8 +308,8 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
 
 // mac screen loader
 const danceVideo = document.createElement("video");
-const body = document.querySelector("body");
-body.append(danceVideo);
+// const body = document.querySelector("body");
+// body.append(danceVideo);
 
 document.addEventListener(
   "contextmenu",
@@ -310,7 +342,7 @@ gltfLoader.load("/model/macScreen.glb", (gltf) => {
 });
 
 // computer screen
-const logoTexture = textureLoader.load("/texture/logo.png");
+const logoTexture = textureLoader.load("/texture/logo.jpg");
 logoTexture.encoding = sRGBEncoding;
 const logoMat = new THREE.MeshBasicMaterial({
   map: logoTexture,
@@ -410,7 +442,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.outputEncoding = THREE.sRGBEncoding;
-// renderer.setClearColor(gradient);
+renderer.setClearColor(0x0a1b30);
 
 // stats
 const stats = Stats();
