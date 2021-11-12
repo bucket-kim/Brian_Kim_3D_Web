@@ -381,6 +381,9 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.25;
 
+const minPan = new THREE.Vector3(-2, -2, -2);
+const maxPan = new THREE.Vector3(2, 2, 2);
+
 // const gradient = new THREE.Mesh(
 //   new THREE.PlaneBufferGeometry(2, 2, 1, 1),
 //   new THREE.ShaderMaterial({
