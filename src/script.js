@@ -68,7 +68,7 @@ const overlay = new THREE.Mesh(overlayGeo, overlayMat);
 // scene.add(overlay);
 
 // load textures
-const houseMap = textureLoader.load("texture/house_baked.png");
+const houseMap = textureLoader.load("texture/house_baked.jpg");
 houseMap.flipY = false;
 houseMap.encoding = THREE.sRGBEncoding;
 
@@ -76,7 +76,7 @@ const houseNightMap = textureLoader.load("texture/house_baked_noLight.png");
 houseNightMap.flipY = false;
 houseNightMap.encoding = THREE.sRGBEncoding;
 
-const lighttMap = textureLoader.load("texture/house_night_baked.png");
+const lighttMap = textureLoader.load("texture/house_night_baked.jpg");
 lighttMap.flipY = false;
 lighttMap.encoding = THREE.sRGBEncoding;
 
