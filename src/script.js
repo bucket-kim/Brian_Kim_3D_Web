@@ -308,8 +308,8 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
 
 // mac screen loader
 const danceVideo = document.createElement("video");
-// const body = document.querySelector("body");
-// body.append(danceVideo);
+const body = document.querySelector("body");
+body.append(danceVideo);
 
 document.addEventListener(
   "contextmenu",
