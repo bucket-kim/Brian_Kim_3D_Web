@@ -242,7 +242,6 @@ gltfLoader.load("/model/photos.glb", (gltf) => {
     child.material = lightShader;
   });
   gltf.scene.position.y = -1;
-  chair = gltf.scene.children[0];
   scene.add(gltf.scene);
 });
 
