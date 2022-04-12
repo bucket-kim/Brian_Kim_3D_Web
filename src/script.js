@@ -32,19 +32,19 @@ const scene = new THREE.Scene();
 // loadingManager
 const loadingLine = document.querySelector(".loading-bar");
 
-// const loadingManager = new THREE.LoadingManager(
-//   () => {
-//     gsap.delayedCall(0.5, () => {
-//       gsap.to(overlayMat.uniforms.uAlpha, { duration: 5, value: 0, delay: 1 });
-//       loadingLine.classList.add("ended");
-//       loadingLine.style.transform = "";
-//     });
-//   },
-//   (itemUrl, itemLoaded, itemTotal) => {
-//     const progressRatio = itemLoaded / itemTotal;
-//     loadingLine.style.transform = `scaleX(${progressRatio})`;
-//   }
-// );
+const loadingManager = new THREE.LoadingManager(
+  () => {
+    gsap.delayedCall(0.5, () => {
+      gsap.to(overlayMat.uniforms.uAlpha, { duration: 5, value: 0, delay: 1 });
+      loadingLine.classList.add("ended");
+      loadingLine.style.transform = "";
+    });
+  },
+  (itemUrl, itemLoaded, itemTotal) => {
+    const progressRatio = itemLoaded / itemTotal;
+    loadingLine.style.transform = `scaleX(${progressRatio})`;
+  }
+);
 
 // draco loader
 const dracoLoader = new DRACOLoader();
@@ -410,7 +410,7 @@ controls.minPolarAngle = 0;
 controls.maxPolarAngle = Math.PI / 2;
 
 controls.minDistance = 3;
-controls.maxDistance = 20;
+controls.maxDistance = 27;
 
 controls.zoomSpeed = 0.3;
 
