@@ -19,6 +19,29 @@ import { sRGBEncoding } from "three";
  */
 // Debug
 // const gui = new dat.GUI();
+// loadingManager
+const loadingLine = document.querySelector(".loading-bar");
+
+const loadingManager = new THREE.LoadingManager(
+  // loaded
+  () => {
+    gsap.delayedCall(0.5, () => {
+      gsap.to(overlayMat.uniforms.uAlpha, {
+        duration: 1,
+        value: 0,
+        delay: 0.25,
+      });
+      loadingLine.classList.add("ended");
+      loadingLine.style.transform = "";
+    });
+  },
+  // progress
+
+  (itemUrl, itemLoaded, itemTotal) => {
+    const progressRatio = itemLoaded / itemTotal;
+    loadingLine.style.transform = `scaleX(${progressRatio})`;
+  }
+);
 
 // tweakpane
 const pane = new Pane();
@@ -29,33 +52,16 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
-// loadingManager
-const loadingLine = document.querySelector(".loading-bar");
-
-const loadingManager = new THREE.LoadingManager(
-  () => {
-    gsap.delayedCall(0.5, () => {
-      gsap.to(overlayMat.uniforms.uAlpha, { duration: 5, value: 0, delay: 1 });
-      loadingLine.classList.add("ended");
-      loadingLine.style.transform = "";
-    });
-  },
-  (itemUrl, itemLoaded, itemTotal) => {
-    const progressRatio = itemLoaded / itemTotal;
-    loadingLine.style.transform = `scaleX(${progressRatio})`;
-  }
-);
-
 // draco loader
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("/js/libs/draco");
 
 // GLTF loader
-const gltfLoader = new GLTFLoader();
+const gltfLoader = new GLTFLoader(loadingManager);
 gltfLoader.setDRACOLoader(dracoLoader);
 
 // Texture loader
-const textureLoader = new THREE.TextureLoader();
+const textureLoader = new THREE.TextureLoader(loadingManager);
 
 // initial loader
 // const cubeTextureLoader = new THREE.CubeTextureLoader(loadingManager);
@@ -64,12 +70,13 @@ const overlayGeo = new THREE.PlaneBufferGeometry(2, 2, 1, 1);
 const overlayMat = new THREE.ShaderMaterial({
   transparent: true,
   uniforms: {
-    uAlpha: { value: 1.0 },
+    uAlpha: { value: 1 },
   },
   vertexShader: loadVertexShader,
   fragmentShader: loadFragmentShader,
 });
 const overlay = new THREE.Mesh(overlayGeo, overlayMat);
+scene.add(overlay);
 
 // scene.add(overlay);
 
