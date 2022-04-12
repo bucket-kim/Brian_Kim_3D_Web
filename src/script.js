@@ -3,6 +3,7 @@ import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import gsap from "gsap";
 import vertexShader from "./shader/coffeeSteam/vertex.glsl";
 import fragmentShader from "./shader/coffeeSteam/fragment.glsl";
@@ -45,8 +46,13 @@ const loadingLine = document.querySelector(".loading-bar");
 //   }
 // );
 
+// draco loader
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath("/js/libs/draco");
+
 // GLTF loader
 const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
 
 // Texture loader
 const textureLoader = new THREE.TextureLoader();
@@ -72,7 +78,7 @@ const houseMap = textureLoader.load("texture/house_baked.jpg");
 houseMap.flipY = false;
 houseMap.encoding = THREE.sRGBEncoding;
 
-const houseNightMap = textureLoader.load("texture/house_baked_noLight.png");
+const houseNightMap = textureLoader.load("texture/house_night_baked.png");
 houseNightMap.flipY = false;
 houseNightMap.encoding = THREE.sRGBEncoding;
 
@@ -213,7 +219,7 @@ emission.addInput(lightShader.uniforms.uFairyLightStrength, "value", {
 });
 
 // static house
-gltfLoader.load("/model/basic_house_join.glb", (gltf) => {
+gltfLoader.load("/model/scene_color.glb", (gltf) => {
   gltf.scene.traverse((child) => {
     child.material = lightShader;
   });
@@ -412,8 +418,16 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.25;
 
-const minPan = new THREE.Vector3(-2, -2, -2);
-const maxPan = new THREE.Vector3(2, 2, 2);
+const minPan = new THREE.Vector3(-1.5, -1, -1.5);
+const maxPan = new THREE.Vector3(1.5, 2, 1.5);
+const _v = new THREE.Vector3();
+
+controls.addEventListener("change", () => {
+  _v.copy(controls.target);
+  controls.target.clamp(minPan, maxPan);
+  _v.sub(controls.target);
+  camera.position.sub(_v);
+});
 
 // const gradient = new THREE.Mesh(
 //   new THREE.PlaneBufferGeometry(2, 2, 1, 1),
