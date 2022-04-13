@@ -20,6 +20,8 @@ import { sRGBEncoding } from "three";
 // Debug
 // const gui = new dat.GUI();
 // loadingManager
+let sceneReady = false;
+
 const loadingLine = document.querySelector(".loading-bar");
 
 const loadingManager = new THREE.LoadingManager(
@@ -34,6 +36,9 @@ const loadingManager = new THREE.LoadingManager(
       loadingLine.classList.add("ended");
       loadingLine.style.transform = "";
     });
+    window.setTimeout(() => {
+      sceneReady = true;
+    }, 2000);
   },
   // progress
 
@@ -149,6 +154,7 @@ const lightShader = new THREE.ShaderMaterial({
 
 const dayNight = pane.addFolder({
   title: "Day and Night",
+  expanded: true,
 });
 
 // const lightSwitch = pane.addInput(lightShader.uniforms.uNightLight, "value", {
@@ -166,6 +172,7 @@ dayNight.addInput(lightShader.uniforms.uMix, "value", {
 
 const emission = pane.addFolder({
   title: "Emission Lights",
+  expanded: false,
 });
 
 emission
@@ -261,28 +268,28 @@ gltfLoader.load("/model/photos.glb", (gltf) => {
 // coffee steam model
 
 let steamColor = {
-  color: "#95847e",
+  color: "#ffffff",
 };
 
 const steamShader = new THREE.ShaderMaterial({
-  color: steamColor,
   transparent: true,
   depthWrite: false,
-  vertexShader: vertexShader,
-  fragmentShader: fragmentShader,
   uniforms: {
     uTime: { value: 0 },
     uTimeFreq: { value: 0.5 },
     vUvFrequency: { value: new THREE.Vector2(2.5, 2.5) },
     uColor: { value: new THREE.Color(steamColor.color) },
   },
+  vertexShader: vertexShader,
+  fragmentShader: fragmentShader,
 });
 
 gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
   const model = gltf.scene;
-  model.name = "model";
+  // model.name = "model";
   const coffeeSteam = pane.addFolder({
     title: "coffee steam",
+    expanded: false,
   });
   model.traverse((child) => {
     child.material = steamShader;
@@ -316,6 +323,8 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
   });
   model.position.y = -1;
   scene.add(model);
+
+  console.log(model);
 });
 
 // mac screen loader
@@ -367,6 +376,25 @@ gltfLoader.load("/model/computerScreen.glb", (gltf) => {
   gltf.scene.position.y = -1;
   scene.add(gltf.scene);
 });
+
+// raycaster
+const raycaster = new THREE.Raycaster();
+
+// points of interests
+const points = [
+  {
+    position: new THREE.Vector3(-2.65, 2, 0.75),
+    element: document.querySelector(".point-0"),
+  },
+  {
+    position: new THREE.Vector3(-2, 1.5, -0.7),
+    element: document.querySelector(".point-1"),
+  },
+  {
+    position: new THREE.Vector3(2.1, 1.5, -1.8),
+    element: document.querySelector(".point-2"),
+  },
+];
 
 /**
  * Sizes
@@ -425,8 +453,8 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.rotateSpeed = 0.25;
 
-const minPan = new THREE.Vector3(-1.5, -1, -1.5);
-const maxPan = new THREE.Vector3(1.5, 2, 1.5);
+const minPan = new THREE.Vector3(-2.5, -1, -2.5);
+const maxPan = new THREE.Vector3(2.5, 1, 2.5);
 const _v = new THREE.Vector3();
 
 controls.addEventListener("change", () => {
@@ -435,22 +463,6 @@ controls.addEventListener("change", () => {
   _v.sub(controls.target);
   camera.position.sub(_v);
 });
-
-// const gradient = new THREE.Mesh(
-//   new THREE.PlaneBufferGeometry(2, 2, 1, 1),
-//   new THREE.ShaderMaterial({
-//     uniforms: {
-//       uColorA: { value: new THREE.Color(0x7bdbf6) },
-//       uColorB: { value: new THREE.Color(0x0693f4) },
-//     },
-//     vertexShader: gradVertexShader,
-//     fragmentShader: gradFragmentShader,
-//   })
-// );
-
-// gradient.depthWrite = false;
-// gradient.renderOrder = -999999;
-// scene.add(gradient);
 
 /**
  * Renderer
@@ -466,7 +478,7 @@ renderer.setClearColor(0x0a1b30);
 
 // stats
 const stats = Stats();
-document.body.appendChild(stats.dom);
+// document.body.appendChild(stats.dom);
 
 /**
  * Animate
@@ -483,13 +495,40 @@ const tick = () => {
   // steam animation
   steamShader.uniforms.uTime.value = elapsedTime;
 
+  // points
+  if (sceneReady) {
+    for (const point of points) {
+      const screenPosition = point.position.clone();
+      screenPosition.project(camera);
+
+      raycaster.setFromCamera(screenPosition, camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+      if (intersects.length === 0) {
+        point.element.classList.add("visible");
+      } else {
+        const intersectionDistance = intersects[0].distance;
+        const pointDistance = point.position.distanceTo(camera.position);
+
+        if (intersectionDistance < pointDistance) {
+          point.element.classList.remove("visible");
+        } else {
+          point.element.classList.add("visible");
+        }
+      }
+
+      const translateX = screenPosition.x * sizes.width * 0.5;
+      const translateY = -screenPosition.y * sizes.height * 0.5;
+      point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px) `;
+    }
+  }
+
   // chair animation
   chair.rotation.y = Math.sin(elapsedTime * 0.75) * 0.5;
 
   // Render
   renderer.render(scene, camera);
 
-  stats.update();
+  // stats.update();
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
