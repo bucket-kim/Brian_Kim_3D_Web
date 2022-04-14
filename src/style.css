@@ -63,7 +63,7 @@ body {
 }
 
 .point.visible .label {
-  transform: scale(0.55, 0.55);
+  transform: scale(0.75, 0.75);
 }
 
 .point.visible .label:hover {
@@ -140,4 +140,12 @@ body {
   opacity: 0;
   transition: opacity 0.2s;
   pointer-events: none;
+}
+
+.description {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
 }

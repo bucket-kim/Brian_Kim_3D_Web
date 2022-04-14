@@ -323,8 +323,6 @@ gltfLoader.load("/model/coffee_steam.glb", (gltf) => {
   });
   model.position.y = -1;
   scene.add(model);
-
-  console.log(model);
 });
 
 // mac screen loader
@@ -485,6 +483,8 @@ const stats = Stats();
  */
 
 const clock = new THREE.Clock();
+
+const contact = document.querySelector(".phone");
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
