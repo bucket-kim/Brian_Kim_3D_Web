@@ -8,6 +8,8 @@ module.exports = {
   output: {
     filename: "bundle.[contenthash].js",
     path: path.resolve(__dirname, "../dist"),
+
+    publicPath: "/",
   },
   devtool: "source-map",
   plugins: [
@@ -15,11 +17,16 @@ module.exports = {
       patterns: [{ from: path.resolve(__dirname, "../static") }],
     }),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "../src/index.html"),
-      minify: true,
+      filename: "index.html",
+      template: "src/index.html",
     }),
+    // new HtmlWebpackPlugin({
+    //   template: path.resolve(__dirname, "../src/index.html"),
+    //   minify: true,
+    // }),
     new MiniCSSExtractPlugin(),
   ],
+
   module: {
     rules: [
       // HTML

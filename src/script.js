@@ -381,11 +381,11 @@ const raycaster = new THREE.Raycaster();
 // points of interests
 const points = [
   {
-    position: new THREE.Vector3(-2.65, 2, 0.75),
+    position: new THREE.Vector3(-2.5, 2, 0.75),
     element: document.querySelector(".point-0"),
   },
   {
-    position: new THREE.Vector3(-2, 1.5, -0.7),
+    position: new THREE.Vector3(-1.9, 1.5, -0.7),
     element: document.querySelector(".point-1"),
   },
   {
