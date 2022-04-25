@@ -49,7 +49,7 @@ const loadingManager = new THREE.LoadingManager(
 );
 
 // tweakpane
-const pane = new Pane();
+const pane = new Pane({});
 
 // Canvas
 const canvas = document.querySelector("canvas.webgl");

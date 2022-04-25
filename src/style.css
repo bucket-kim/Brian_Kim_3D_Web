@@ -174,3 +174,59 @@ a {
 .nav-link > a {
   margin-right: 4rem;
 }
+
+@media screen and (max-width: 390px) {
+  .description {
+    font-size: 12px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+  }
+
+  .nav-list {
+    font-size: 14px;
+    left: 21%;
+    bottom: 3%;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-link > a {
+    margin-right: 1.75rem;
+  }
+
+  .phone {
+    position: absolute;
+    bottom: 6%;
+    /* top: 40px; */
+    left: 24px;
+  }
+
+  .phone .label {
+    background-color: #00000077;
+    position: absolute;
+    /* top: -20px;
+    left: -20px; */
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #ffffff77;
+    color: #ffffff;
+    font-family: Helvetica, sans-serif;
+    text-align: center;
+    line-height: 30px;
+    font-weight: 400;
+    font-size: 14px;
+    cursor: pointer;
+
+    transition: transform 0.3s;
+  }
+
+  .tp-dfwv {
+    width: 180px;
+  }
+}
