@@ -175,6 +175,14 @@ a {
   margin-right: 4rem;
 }
 
+@media screen and (max-width: 959px) {
+  .nav-list {
+    font-size: 20px;
+    left: 35%;
+    bottom: 4%;
+  }
+}
+
 @media screen and (max-width: 390px) {
   .description {
     font-size: 12px;
@@ -196,12 +204,12 @@ a {
   }
 
   .nav-link > a {
-    margin-right: 1.75rem;
+    margin-right: 1.65rem;
   }
 
   .phone {
     position: absolute;
-    bottom: 6%;
+    bottom: 6.5%;
     /* top: 40px; */
     left: 24px;
   }
