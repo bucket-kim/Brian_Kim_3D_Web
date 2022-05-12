@@ -478,6 +478,20 @@ renderer.setClearColor(0x0a1b30);
 const stats = Stats();
 // document.body.appendChild(stats.dom);
 
+// sound
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+const sound = new THREE.Audio(listener);
+
+const audioLoader = new THREE.AudioLoader(loadingManager);
+audioLoader.load("sound/bg.ogg", (buffer) => {
+  sound.setBuffer(buffer);
+  sound.setLoop(true);
+  sound.setVolume(0.05);
+  sound.play();
+});
+
 /**
  * Animate
  */
